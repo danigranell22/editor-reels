@@ -26,8 +26,8 @@ Si `modelos/` no existe, ejecuta `./instalar.sh` (descarga ~640 MB la primera ve
    En entrenamiento, prioriza tren superior / calistenia. Mejor sin imagen que con una que no pega.
 4b. **GIFs sueltos** (`--gif RUTA@INI-FIN`, tiempos del vídeo ORIGINAL, los de `--transcribir`): cuando se
    quita el título, de uno en uno encima de la cabeza, cada uno mientras dice la palabra o frase que ilustra
-   (p. ej. `gifs/sol-luz-brillante.gif@12.6-14.7` mientras dice "te expones a la luz"). Unos 1,5-3 s cada
-   uno; no hace falta que haya GIF todo el rato. Elige por el nombre del archivo; si un GIF nuevo tiene un
+   (p. ej. `gifs/sol-luz-brillante.gif@12.6-14.7` mientras dice "te expones a la luz"). Daniel los quiere largos: unos 3-4 s cada
+   uno, encadenados uno detrás de otro (casi sin huecos) desde que se quita el título hasta el final. Elige por el nombre del archivo; si un GIF nuevo tiene un
    nombre poco claro, míralo (saca un fotograma) y renómbralo con `git mv` a algo descriptivo.
 5. **Música** (`--musica`, opcional): una pista de `musica/<ambiente>/` según el tema
    (tranquila: descanso/salud · motivadora: entrenamiento/mentalidad · emotiva: historias). Volumen por defecto 0.10.

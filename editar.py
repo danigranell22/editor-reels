@@ -264,7 +264,7 @@ def limpiar(t):
 
 
 # Hueco para los GIFs sueltos: encima de la cabeza (contando el zoom de los cortes)
-GIF_ANCHO, GIF_ALTO, GIF_Y = 900, 400, 40
+GIF_ANCHO, GIF_ALTO, GIF_Y = 1000, 470, 30
 
 
 def entrada_visual(ruta, dur):
