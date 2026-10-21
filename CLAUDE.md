@@ -10,4 +10,4 @@ Lee y cumple siempre @my-rules.md (reglas de edición de Daniel). Tienen priorid
 - GIFs (pedido por Daniel): 3 en fila detrás del título durante el hook; después, de uno en uno encima de la cabeza (caja de 1000x470 arriba, pueden rozar el pelo), sincronizados con lo que dice. Fotos y GIFs con esquinas redondeadas (radio 28 px) y sombra suave detrás, como la del texto.
 - Clips de Daniel (b-roll): a pantalla completa con su voz debajo, de broll/.
 - Publicación: 5 versiones por vídeo, cada una con diseño distinto (normal, bandas, recuadro, lateral, velocidad) y hook distinto, para Reels de prueba, con textos en salidas/<nombre>_publicaciones.md. Daniel las programa él (Metricool / Meta Business Suite / TikTok Studio); no hay publicación automática desde aquí.
-- Formato bandas: franja fina 16:9 en el centro con la cara entera (lados rellenos con el mismo vídeo difuminado). Formato recuadro: recuadro de 720 px.
+- Formato bandas: franja fina 16:9 en el centro con la cara entera (lados rellenos con el mismo vídeo difuminado). Formato recuadro: mismo encuadre que bandas (cara entera, 656x608) en recuadro redondeado, sin relleno difuminado: negro alrededor.

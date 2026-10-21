@@ -394,8 +394,9 @@ def geometria(formato, n_imgs, principal, args):
                         "boxblur=25:2,eq=brightness=-0.12[fbg];[ff]scale=-2:608[ffg];"
                         "[fbg][ffg]overlay=(W-w)/2:0", 0, 656, None))
     elif formato == "recuadro":
-        g.update(imgs=fila(280, 110), hook_y=400, subs_y=1480, gif=(90, 60, 900, 460),
-                 video=("crop=1080:1080:0:266,scale=720:720", 180, 560, 40))
+        # Mismo encuadre que bandas (cara entera, 608 px de alto) pero sin relleno: recuadro redondeado sobre negro
+        g.update(imgs=fila(300, 150), hook_y=470, subs_y=1420, gif=(90, 80, 900, 520),
+                 video=("crop=1080:1000:0:500,scale=656:608", (W - 656) // 2, 656, 40))
     elif formato == "lateral":
         col = 440
         g.update(imgs=[(30, 600 + k * 270, col - 60, 250) for k in range(n_imgs)],
@@ -410,15 +411,15 @@ def geometria(formato, n_imgs, principal, args):
     return g
 
 
-def marco_redondeado(lado, radio):
+def marco_redondeado(ancho, alto, radio):
     """PNG con las esquinas en negro y el centro transparente: encima del vídeo lo deja redondeado."""
     from PIL import Image, ImageDraw
 
-    ruta = Path(__file__).resolve().parent / "salidas" / ".cache" / f"marco_{lado}_{radio}.png"
+    ruta = Path(__file__).resolve().parent / "salidas" / ".cache" / f"marco_{ancho}x{alto}_{radio}.png"
     if not ruta.exists():
         ruta.parent.mkdir(parents=True, exist_ok=True)
-        im = Image.new("RGBA", (lado, lado), (0, 0, 0, 255))
-        ImageDraw.Draw(im).rounded_rectangle((0, 0, lado - 1, lado - 1), radio, fill=(0, 0, 0, 0))
+        im = Image.new("RGBA", (ancho, alto), (0, 0, 0, 255))
+        ImageDraw.Draw(im).rounded_rectangle((0, 0, ancho - 1, alto - 1), radio, fill=(0, 0, 0, 0))
         im.save(ruta)
     return ruta
 
@@ -589,8 +590,8 @@ def main():
         idx += 1
     i_marco = None
     if lay["video"] and lay["video"][3]:
-        lado_v = int(lay["video"][0].rsplit("=", 1)[1].split(":")[0])
-        cmd += ["-loop", "1", "-t", f"{duracion:.3f}", "-i", str(marco_redondeado(lado_v, lay["video"][3]))]
+        ancho_v, alto_v = (int(x) for x in lay["video"][0].rsplit("=", 1)[1].split(":")[:2])
+        cmd += ["-loop", "1", "-t", f"{duracion:.3f}", "-i", str(marco_redondeado(ancho_v, alto_v, lay["video"][3]))]
         i_marco, idx = idx, idx + 1
     # Clips de b-roll a pantalla completa (sin su audio; la voz sigue debajo)
     brolls = []

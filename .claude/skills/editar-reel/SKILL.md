@@ -44,7 +44,7 @@ Si `modelos/` no existe, ejecuta `./instalar.sh` (descarga ~640 MB la primera ve
    distintas para que Instagram no las tome por el mismo vídeo. Cada versión usa un `--formato` distinto y
    además cambia el hook escrito y las imágenes del hook:
    v1 `normal` · v2 `bandas` (franja fina 16:9 con la cara en medio; negro arriba con título/fotos/GIFs y abajo con subtítulos) · v3 `recuadro`
-   (vídeo en recuadro redondeado pequeño sobre negro) · v4 `lateral` (cara a la derecha, columna negra a la izquierda
+   (mismo encuadre que bandas, pero en recuadro redondeado con negro a los lados) · v4 `lateral` (cara a la derecha, columna negra a la izquierda
    con todo; máx. 2 fotos en el hook) · v5 `velocidad` (normal acelerado ×1,15).
    Los hooks atacan ángulos distintos (beneficio, dato, acción, problema, concreto) sin prometer nada que no
    diga en el vídeo. Evita GIFs que empiecen en negro en la fila del hook. La transcripción va en caché, así
