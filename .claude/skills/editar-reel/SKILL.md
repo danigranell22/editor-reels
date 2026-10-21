@@ -8,6 +8,15 @@ description: Edita un vídeo de Daniel hablando a cámara y lo deja listo para I
 Antes de nada, lee `my-rules.md` (reglas de Daniel) y `CLAUDE.md` (estilo acordado). Mandan sobre esta guía.
 Si `modelos/` no existe, ejecuta `./instalar.sh` (descarga ~640 MB la primera vez).
 
+## Lotes de vídeos desde una carpeta
+
+Si Daniel dice "edita los vídeos de la carpeta X y guárdalos en Y" (en su ordenador suele ser
+`~/Desktop/Mobile Devices` → `~/Desktop/videos insta`; si no existen con ese nombre exacto, búscalas en el
+Escritorio y pregunta si hay dudas): procesa todos los vídeos de X (.mov, .mp4, .m4v), uno a uno, con los pasos
+de abajo. Guarda en Y una carpeta por vídeo con sus 5 versiones y su `_publicaciones.md`. No borres ni muevas
+los originales. Junta todas las dudas (palabras que no se entienden, hooks verbales flojos) en un solo mensaje
+al final.
+
 ## Pasos
 
 1. **Transcribir** y leer lo que dice, con tiempos por palabra:
