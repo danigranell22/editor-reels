@@ -290,6 +290,22 @@ ESQUINAS = ("geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':"
             f"if(lte(hypot(abs(X-W/2)-(W/2-{R_ESQUINA}),abs(Y-H/2)-(H/2-{R_ESQUINA})),{R_ESQUINA}),255,0),255)'")
 
 
+def con_sombra(fc, v, src, x, y, k):
+    """Pone `src` (RGBA) sobre `v` en (x, y) con una sombra suave detrás, como la del texto.
+
+    x/y pueden usar w y h (tamaño de la imagen). Devuelve la nueva etiqueta del vídeo.
+    """
+    m = 40  # margen para que la sombra difumine sin cortarse
+    fc.append(f"[{src}]split[{src}i][{src}s]")
+    fc.append(f"[{src}s]colorchannelmixer=rr=0:gg=0:bb=0:aa=0.55,pad=iw+{2 * m}:ih+{2 * m}:{m}:{m}:color=black@0,"
+              f"boxblur=luma_radius=14:luma_power=2:alpha_radius=14:alpha_power=2[{src}b]")
+    xs = x.replace("w", f"(w-{2 * m})").replace("h", f"(h-{2 * m})")
+    ys = y.replace("w", f"(w-{2 * m})").replace("h", f"(h-{2 * m})")
+    fc.append(f"[{v}][{src}b]overlay=({xs})-{m}+6:({ys})-{m}+10:eof_action=pass[sh{k}]")
+    fc.append(f"[sh{k}][{src}i]overlay={x}:{y}:eof_action=pass[ov{k}]")
+    return f"ov{k}"
+
+
 def entrada_visual(ruta, dur):
     """Argumentos de ffmpeg para una foto, GIF o clip, repetido en bucle durante `dur` segundos."""
     ext = Path(ruta).suffix.lower()
@@ -370,11 +386,16 @@ def geometria(formato, n_imgs, principal, args):
         g.update(imgs=fila(lado, 250), hook_y=250 + lado + 10 if n_imgs else 430,
                  subs_y=int(H * args.y_subs), gif=(40, GIF_Y, GIF_ANCHO, GIF_ALTO), video=None)
     elif formato == "bandas":
-        g.update(imgs=fila(250, 45), hook_y=375, subs_y=1760, gif=(90, 30, 900, 400),
-                 video=("crop=1080:1080:0:266", 0, 450, None))
+        # Franja fina 16:9 (1080x608) centrada en la cara, en mitad de la pantalla
+        g.update(imgs=fila(300, 150), hook_y=470, subs_y=1420, gif=(90, 80, 900, 520),
+                 # la cara entera (de 1000 px de alto) cabe en el centro; los lados, el mismo vídeo difuminado
+                 video=("crop=1080:1000:0:500,split[fb][ff];"
+                        "[fb]scale=1080:608:force_original_aspect_ratio=increase,crop=1080:608,"
+                        "boxblur=25:2,eq=brightness=-0.12[fbg];[ff]scale=-2:608[ffg];"
+                        "[fbg][ffg]overlay=(W-w)/2:0", 0, 656, None))
     elif formato == "recuadro":
-        g.update(imgs=fila(260, 45), hook_y=315, subs_y=1680, gif=(90, 30, 900, 410),
-                 video=("crop=1080:1080:0:266,scale=900:900", 90, 470, 48))
+        g.update(imgs=fila(280, 110), hook_y=400, subs_y=1480, gif=(90, 60, 900, 460),
+                 video=("crop=1080:1080:0:266,scale=720:720", 180, 560, 40))
     elif formato == "lateral":
         col = 440
         g.update(imgs=[(30, 600 + k * 270, col - 60, 250) for k in range(n_imgs)],
@@ -642,15 +663,13 @@ def main():
         fin_h = args.hook_texto_seg
         fc.append(f"[{ii}:v]scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},"
                   f"setsar=1,format=rgba,{ESQUINAS},fade=t=in:d=0.12:alpha=1,fade=t=out:st={fin_h - 0.15}:d=0.15:alpha=1[im{k}]")
-        fc.append(f"[{v}][im{k}]overlay={x}:{y}:eof_action=pass[vi{k}]")
-        v = f"vi{k}"
+        v = con_sombra(fc, v, f"im{k}", str(x), str(y), f"i{k}")
     for k, (ii, a, b) in enumerate(gifs):
         gx, gy, gw, gh = lay["gif"]
         fc.append(f"[{ii}:v]fps=30,scale={gw}:{gh}:force_original_aspect_ratio=decrease,setsar=1,"
                   f"format=rgba,{ESQUINAS},fade=t=in:d=0.15:alpha=1,fade=t=out:st={b - a - 0.15:.3f}:d=0.15:alpha=1,"
                   f"setpts=PTS-STARTPTS+{a:.3f}/TB[gf{k}]")
-        fc.append(f"[{v}][gf{k}]overlay={gx}+({gw}-w)/2:{gy}+({gh}-h)/2:eof_action=pass[vg{k}]")
-        v = f"vg{k}"
+        v = con_sombra(fc, v, f"gf{k}", f"{gx}+({gw}-w)/2", f"{gy}+({gh}-h)/2", f"g{k}")
     ass_esc = str(ass_path.resolve()).replace("\\", "/").replace(":", r"\:").replace("'", r"\'")
     fdir = str(FUENTES).replace("\\", "/").replace(":", r"\:").replace("'", r"\'")
     fc.append(f"[{v}]ass='{ass_esc}':fontsdir='{fdir}'[vout]")
