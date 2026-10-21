@@ -38,4 +38,5 @@ Claude sigue la skill `.claude/skills/editar-reel` y tus reglas de `my-rules.md`
 - `--zoom-cortes 0.10` salto de zoom alterno en cada corte · `--zoom-lento 0.03` acercamiento lento (0 = sin)
 - `--clave palabra …` resalta esas palabras en amarillo
 - `--y-subs 0.80` altura de los subtítulos · `--tam-subs 52` tamaño
+- `--formato normal|bandas|recuadro|lateral|velocidad` diseño de la versión (`--velocidad 1.15` para acelerar)
 - `--salida salidas/nombre.mp4`

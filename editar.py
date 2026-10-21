@@ -349,6 +349,59 @@ def ajustar_tam(texto, ancho, espaciado=-2, maximo=110):
     return int(min(tam, maximo))
 
 
+FORMATOS = ("normal", "bandas", "recuadro", "lateral", "velocidad")
+
+
+def geometria(formato, n_imgs, principal, args):
+    """Dónde va cada cosa en cada formato (para que cada versión se vea distinta en Instagram).
+
+    normal/velocidad: vídeo a pantalla completa. bandas: vídeo cuadrado en medio con franjas negras arriba
+    (título, fotos, GIFs) y abajo (subtítulos). recuadro: igual pero el vídeo en un recuadro redondeado.
+    lateral: cara a la derecha y columna negra a la izquierda con título, fotos, GIFs y subtítulos.
+    """
+    g = {"ajustar": True, "envolver": False, "hook_ml": 50, "hook_mr": 50, "subs_ml": 80, "subs_mr": 80}
+
+    def fila(lado, y):
+        x0 = (W - n_imgs * lado - (n_imgs - 1) * 4) // 2
+        return [(x0 + k * (lado + 4), y, lado, lado) for k in range(n_imgs)]
+
+    if formato in ("normal", "velocidad"):
+        lado = 316 if n_imgs == 3 else 380
+        g.update(imgs=fila(lado, 250), hook_y=250 + lado + 10 if n_imgs else 430,
+                 subs_y=int(H * args.y_subs), gif=(40, GIF_Y, GIF_ANCHO, GIF_ALTO), video=None)
+    elif formato == "bandas":
+        g.update(imgs=fila(250, 45), hook_y=375, subs_y=1760, gif=(90, 30, 900, 400),
+                 video=("crop=1080:1080:0:266", 0, 450, None))
+    elif formato == "recuadro":
+        g.update(imgs=fila(260, 45), hook_y=315, subs_y=1680, gif=(90, 30, 900, 410),
+                 video=("crop=1080:1080:0:266,scale=900:900", 90, 470, 48))
+    elif formato == "lateral":
+        col = 440
+        g.update(imgs=[(30, 600 + k * 270, col - 60, 250) for k in range(n_imgs)],
+                 hook_y=110, ajustar=False, envolver=True, hook_ml=30, hook_mr=W - col + 30,
+                 subs_y=1420, subs_ml=30, subs_mr=W - col + 30, gif=(30, 600, col - 60, 560),
+                 video=("crop=640:1920:220:0", col, 0, None))
+    else:
+        raise SystemExit(f"Formato desconocido: {formato}. Usa uno de: {', '.join(FORMATOS)}")
+    filas = g["imgs"]
+    ancho = (filas[-1][0] + filas[-1][2] - filas[0][0]) if filas and not g["envolver"] else W - 140
+    g["tam_hook"] = args.tam_hook or (ajustar_tam(principal, ancho) if g["ajustar"] else 66)
+    return g
+
+
+def marco_redondeado(lado, radio):
+    """PNG con las esquinas en negro y el centro transparente: encima del vídeo lo deja redondeado."""
+    from PIL import Image, ImageDraw
+
+    ruta = Path(__file__).resolve().parent / "salidas" / ".cache" / f"marco_{lado}_{radio}.png"
+    if not ruta.exists():
+        ruta.parent.mkdir(parents=True, exist_ok=True)
+        im = Image.new("RGBA", (lado, lado), (0, 0, 0, 255))
+        ImageDraw.Draw(im).rounded_rectangle((0, 0, lado - 1, lado - 1), radio, fill=(0, 0, 0, 0))
+        im.save(ruta)
+    return ruta
+
+
 def crear_ass(palabras, duracion, lay, args):
     # Sombra suave sin caja (como el vídeo de referencia): borde negro semitransparente difuminado
     sombra = "&H70000000"
@@ -360,21 +413,28 @@ def crear_ass(palabras, duracion, lay, args):
         "BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, "
         "BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n"
         f"Style: Hook,{FUENTE} Black,{lay['tam_hook']},{BLANCO},{BLANCO},{sombra},{sombra},"
-        f"0,0,0,0,100,100,-2,0,1,3,1,2,50,50,{H - lay['y_hook']},1\n"
+        f"0,0,0,0,100,100,-2,0,1,3,1,{8 if lay['envolver'] else 2},{lay['hook_ml']},{lay['hook_mr']},"
+        f"{lay['hook_y'] if lay['envolver'] else H - lay['hook_y']},1\n"
         f"Style: Hook2,{FUENTE},{args.tam_hook2},{BLANCO},{BLANCO},{sombra},{sombra},"
-        f"0,0,0,0,100,100,0,0,1,3,1,8,60,60,{lay["y_hook"] + 14},1\n"
+        f"0,0,0,0,100,100,0,0,1,3,1,8,{lay['hook_ml'] + 10},{lay['hook_mr'] + 10},{lay['hook_y'] + 14},1\n"
         f"Style: Titulo,{FUENTE},{args.tam_titulo},{BLANCO},{BLANCO},{sombra},{sombra},"
         f"-1,0,0,0,100,100,-1,0,1,3,1,8,70,70,170,1\n"
         f"Style: Subs,{FUENTE} SemiBold,{args.tam_subs},{BLANCO},{BLANCO},{sombra},{sombra},"
-        f"0,0,0,0,100,100,-0.5,0,1,3,1,2,80,80,{H - lay['y_subs']},1\n"
+        f"0,0,0,0,100,100,-0.5,0,1,3,1,2,{lay['subs_ml']},{lay['subs_mr']},{H - lay['subs_y']},1\n"
         "\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n"
     )
-    suave = r"{\blur5}"
-    fade = r"{\fad(120,150)\blur5}"
+    # En la columna lateral el texto puede partirse en varias líneas (\q0); en el resto, siempre una línea
+    q = r"\q0" if lay["envolver"] else ""
+    suave = r"{\blur5" + q + "}"
+    fade = r"{\fad(120,150)\blur5" + q + "}"
 
     if args.hook_texto:
         principal, _, secundaria = args.hook_texto.partition("|")
-        ass += f"Dialogue: 2,{ts(0)},{ts(args.hook_texto_seg)},Hook,,0,0,0,,{fade}{escapar(principal.strip())}\n"
+        texto = escapar(principal.strip())
+        if lay["envolver"] and secundaria.strip():  # en la columna, la secundaria va pegada debajo
+            texto += r"\N{\fn" + FUENTE + r"\fs" + str(args.tam_hook2) + r"\fsp0}" + escapar(secundaria.strip())
+            secundaria = ""
+        ass += f"Dialogue: 2,{ts(0)},{ts(args.hook_texto_seg)},Hook,,0,0,0,,{fade}{texto}\n"
         if secundaria.strip():
             ass += f"Dialogue: 2,{ts(0)},{ts(args.hook_texto_seg)},Hook2,,0,0,0,,{fade}{escapar(secundaria.strip())}\n"
 
@@ -448,6 +508,10 @@ def main():
     ap.add_argument("--tam-hook", type=int, default=0, help="0 = ajustar a una línea del ancho de las fotos")
     ap.add_argument("--tam-hook2", type=int, default=42)
     ap.add_argument("--y-subs", type=float, default=0.80, help="Altura de los subtítulos (0-1)")
+    ap.add_argument("--formato", default="normal", choices=FORMATOS,
+                    help="Diseño: normal, bandas (negro arriba/abajo), recuadro, lateral (cara a la derecha), "
+                         "velocidad (normal acelerado)")
+    ap.add_argument("--velocidad", type=float, default=1.0, help="Acelerar el vídeo final (1.15 = 15 %% más rápido)")
     ap.add_argument("--hilos", type=int, default=4)
     args = ap.parse_args()
 
@@ -478,15 +542,12 @@ def main():
     duracion = sum(b - a for a, b in tramos)
     print(f"      {dur_orig:.1f}s → {duracion:.1f}s ({len(tramos)} tramos)")
 
-    # Layout: fila de fotos arriba, hook pegado a su borde inferior, subtítulos bajo la cara
+    # Layout según el formato
     imagenes = args.imagen[:3]
-    lado = 316 if len(imagenes) == 3 else 380
-    y_img = 250
-    y_hook = y_img + lado + 10 if imagenes else 430
-    ancho_fila = len(imagenes) * lado + (len(imagenes) - 1) * 4 if imagenes else W - 140
     principal = args.hook_texto.partition("|")[0].strip()
-    tam_hook = args.tam_hook or ajustar_tam(principal, ancho_fila)
-    lay = {"y_hook": y_hook, "y_subs": int(H * args.y_subs), "tam_hook": tam_hook}
+    lay = geometria(args.formato, len(imagenes), principal, args)
+    if args.formato == "velocidad" and args.velocidad == 1.0:
+        args.velocidad = 1.15
 
     ass_path = salida.with_suffix(".ass")
     ass_path.write_text(crear_ass(palabras, duracion, lay, args), encoding="utf-8")
@@ -505,6 +566,11 @@ def main():
         cmd += entrada_visual(im, args.hook_texto_seg)
         i_imgs.append(idx)
         idx += 1
+    i_marco = None
+    if lay["video"] and lay["video"][3]:
+        lado_v = int(lay["video"][0].rsplit("=", 1)[1].split(":")[0])
+        cmd += ["-loop", "1", "-t", f"{duracion:.3f}", "-i", str(marco_redondeado(lado_v, lay["video"][3]))]
+        i_marco, idx = idx, idx + 1
     # Clips de b-roll a pantalla completa (sin su audio; la voz sigue debajo)
     brolls = []
     for c in args.broll:
@@ -560,19 +626,30 @@ def main():
                   f"setpts=PTS-STARTPTS+{a:.3f}/TB[br{k}]")
         fc.append(f"[{v}][br{k}]overlay=0:0:eof_action=pass[vb{k}]")
         v = f"vb{k}"
-    hueco = 4
-    x0 = (W - len(i_imgs) * lado - (len(i_imgs) - 1) * hueco) // 2
+    # Los clips van dentro del hueco del vídeo: se montan antes de recortarlo sobre el negro
+    if lay["video"]:
+        recorte, vx, vy, radio = lay["video"]
+        fc.append(f"color=c=black:s={W}x{H}:r=30:d={duracion:.3f}[negro]")
+        fc.append(f"[{v}]{recorte}[vrec]")
+        fc.append(f"[negro][vrec]overlay={vx}:{vy}:shortest=1[lienzo]")
+        v = "lienzo"
+        if radio:
+            fc.append(f"[{i_marco}:v]format=rgba[marco]")
+            fc.append(f"[{v}][marco]overlay={vx}:{vy}:shortest=1[lienzor]")
+            v = "lienzor"
     for k, ii in enumerate(i_imgs):
+        x, y, w, h = lay["imgs"][k]
         fin_h = args.hook_texto_seg
-        fc.append(f"[{ii}:v]scale={lado}:{lado}:force_original_aspect_ratio=increase,crop={lado}:{lado},"
+        fc.append(f"[{ii}:v]scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},"
                   f"setsar=1,format=rgba,{ESQUINAS},fade=t=in:d=0.12:alpha=1,fade=t=out:st={fin_h - 0.15}:d=0.15:alpha=1[im{k}]")
-        fc.append(f"[{v}][im{k}]overlay={x0 + k * (lado + hueco)}:{y_img}:eof_action=pass[vi{k}]")
+        fc.append(f"[{v}][im{k}]overlay={x}:{y}:eof_action=pass[vi{k}]")
         v = f"vi{k}"
     for k, (ii, a, b) in enumerate(gifs):
-        fc.append(f"[{ii}:v]fps=30,scale={GIF_ANCHO}:{GIF_ALTO}:force_original_aspect_ratio=decrease,setsar=1,"
+        gx, gy, gw, gh = lay["gif"]
+        fc.append(f"[{ii}:v]fps=30,scale={gw}:{gh}:force_original_aspect_ratio=decrease,setsar=1,"
                   f"format=rgba,{ESQUINAS},fade=t=in:d=0.15:alpha=1,fade=t=out:st={b - a - 0.15:.3f}:d=0.15:alpha=1,"
                   f"setpts=PTS-STARTPTS+{a:.3f}/TB[gf{k}]")
-        fc.append(f"[{v}][gf{k}]overlay=(W-w)/2:{GIF_Y}+({GIF_ALTO}-h)/2:eof_action=pass[vg{k}]")
+        fc.append(f"[{v}][gf{k}]overlay={gx}+({gw}-w)/2:{gy}+({gh}-h)/2:eof_action=pass[vg{k}]")
         v = f"vg{k}"
     ass_esc = str(ass_path.resolve()).replace("\\", "/").replace(":", r"\:").replace("'", r"\'")
     fdir = str(FUENTES).replace("\\", "/").replace(":", r"\:").replace("'", r"\'")
@@ -601,7 +678,18 @@ def main():
         cmd += ["-map", "[aout]", "-c:a", "aac", "-b:a", "192k", "-ar", "48000"]
     cmd += ["-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p",
             "-r", "30", "-movflags", "+faststart", "-t", f"{duracion:.3f}", str(salida)]
-    run(cmd)
+    if args.velocidad != 1.0:
+        tmp = salida.with_name(salida.stem + "_tmp.mp4")
+        cmd[-1] = str(tmp)
+        run(cmd)
+        f = args.velocidad
+        run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-i", str(tmp), "-filter_complex",
+             f"[0:v]setpts=PTS/{f}[v];[0:a]atempo={f}[a]", "-map", "[v]", "-map", "[a]",
+             "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p", "-r", "30",
+             "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", str(salida)])
+        tmp.unlink()
+    else:
+        run(cmd)
     print(f"[3/3] Listo → {salida}")
 
 
