@@ -1,0 +1,6 @@
+# Modelos de transcripción (640 MB): los descarga instalar.sh
+modelos/
+# Vídeos editados y archivos temporales
+salidas/
+__pycache__/
+*.ass
