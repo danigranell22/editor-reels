@@ -40,7 +40,14 @@ Si `modelos/` no existe, ejecuta `./instalar.sh` (descarga ~640 MB la primera ve
 7. **Revisar** antes de entregar: saca fotogramas (`ffmpeg -ss T -i salida.mp4 -frames:v 1 f.png`) y mira que
    el hook quepa en una línea, que los subtítulos no tapen la cara y que no se corte ninguna palabra.
    Si hace falta, ajusta `--y-subs` (0-1) o `--tam-subs`.
-8. **Entregar** el MP4 con una línea de qué has cortado y qué has añadido, y los avisos que pide my-rules.md.
+8. **Versiones para Reels de prueba** (Daniel quiere 5 por vídeo salvo que diga otra cosa): monta el mismo
+   vídeo 5 veces cambiando el hook escrito (y su secundaria) y el orden/selección de las 3 imágenes del hook;
+   los cortes, subtítulos y GIFs sueltos se mantienen. Cada hook ataca un ángulo distinto (beneficio,
+   curiosidad, problema, pregunta, dato) sin prometer nada que no diga en el vídeo. La transcripción se guarda
+   en caché, así que las versiones 2-5 van rápido. Nombres: `salidas/<nombre>_v1.mp4` … `_v5.mp4`.
+   Escribe `salidas/<nombre>_publicaciones.md` con una tabla de versiones y, para cada una, texto para
+   Instagram/TikTok (2-3 líneas, español de España, una llamada a la acción y 6-8 hashtags).
+9. **Entregar** el MP4 con una línea de qué has cortado y qué has añadido, y los avisos que pide my-rules.md.
 
 ## Ejemplo
 

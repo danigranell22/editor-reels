@@ -132,6 +132,22 @@ def transcribir(video, hilos):
     return palabras
 
 
+def transcribir_con_cache(video, hilos):
+    """Guarda la transcripción en salidas/.cache para no repetirla en cada versión del mismo vídeo."""
+    import hashlib
+
+    st = Path(video).stat()
+    clave = hashlib.sha1(f"{Path(video).resolve()}|{st.st_size}|{st.st_mtime}".encode()).hexdigest()[:16]
+    cache = Path(__file__).resolve().parent / "salidas" / ".cache" / f"{clave}.json"
+    if cache.exists():
+        print("[1/3] Transcripción guardada (no hace falta repetirla)")
+        return json.loads(cache.read_text())
+    palabras = transcribir(video, hilos)
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    cache.write_text(json.dumps(palabras, ensure_ascii=False))
+    return palabras
+
+
 def corregir(palabras, mal, bien, avisar=True):
     """Sustituye una secuencia de palabras repartiendo sus tiempos entre las nuevas."""
     n = len(mal)
@@ -440,7 +456,7 @@ def main():
     info = ffprobe(video)
     dur_orig = float(info["format"]["duration"])
 
-    palabras = transcribir(video, args.hilos)
+    palabras = transcribir_con_cache(video, args.hilos)
     for mal, bien in DICCIONARIO:
         palabras = corregir(palabras, mal.split(), bien.split(), avisar=False)
     for c in args.corregir:

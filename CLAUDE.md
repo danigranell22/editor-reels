@@ -9,3 +9,4 @@ Lee y cumple siempre @my-rules.md (reglas de edición de Daniel). Tienen priorid
 - Ritmo: zoom alterno del 10 % en cada corte + acercamiento lento del 3 % por tramo (punto fijo en la cara). Transiciones llamativas, como mucho 1-2 por vídeo.
 - GIFs (pedido por Daniel): 3 en fila detrás del título durante el hook; después, de uno en uno encima de la cabeza (caja de 1000x470 arriba, pueden rozar el pelo), sincronizados con lo que dice. Fotos y GIFs con esquinas redondeadas (radio 28 px).
 - Clips de Daniel (b-roll): a pantalla completa con su voz debajo, de broll/.
+- Publicación: 5 versiones por vídeo (hook distinto) para Reels de prueba, con textos en salidas/<nombre>_publicaciones.md. Daniel las programa él (Metricool / Meta Business Suite / TikTok Studio); no hay publicación automática desde aquí.
