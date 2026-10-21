@@ -607,7 +607,7 @@ def main():
         brolls.append((idx, a, b))
         idx += 1
     # GIFs sueltos encima de la cabeza: (índice, inicio y fin en el vídeo final)
-    gifs = []
+    gifs, verticales = [], []
     for g in args.gif:
         ruta, _, rango = g.rpartition("@")
         a, b = (float(x) for x in rango.split("-"))
@@ -618,6 +618,8 @@ def main():
         print(f"      GIF {Path(ruta).name}: {a:.1f}-{b:.1f} s")
         cmd += entrada_visual(ruta, b - a)
         gifs.append((idx, a, b))
+        dims = next(x for x in ffprobe(ruta)["streams"] if x["codec_type"] == "video")
+        verticales.append(dims["height"] > dims["width"] * 1.05)
         idx += 1
     if args.hook:
         cmd += ["-i", args.hook]
@@ -667,7 +669,13 @@ def main():
         v = con_sombra(fc, v, f"im{k}", str(x), str(y), f"i{k}")
     for k, (ii, a, b) in enumerate(gifs):
         gx, gy, gw, gh = lay["gif"]
-        fc.append(f"[{ii}:v]fps=30,scale={gw}:{gh}:force_original_aspect_ratio=decrease,setsar=1,"
+        # Fotos/clips verticales en un hueco horizontal: se recortan a 16:9 (sin achicarlos a una tira)
+        if verticales[k] and gw > gh:
+            ajuste = f"scale={gw}:{gw * 9 // 16}:force_original_aspect_ratio=increase,crop={gw}:{gw * 9 // 16}:(iw-ow)/2:(ih-oh)*0.35,"
+            ajuste += f"scale={gw}:{gh}:force_original_aspect_ratio=decrease"
+        else:
+            ajuste = f"scale={gw}:{gh}:force_original_aspect_ratio=decrease"
+        fc.append(f"[{ii}:v]fps=30,{ajuste},setsar=1,"
                   f"format=rgba,{ESQUINAS},fade=t=in:d=0.15:alpha=1,fade=t=out:st={b - a - 0.15:.3f}:d=0.15:alpha=1,"
                   f"setpts=PTS-STARTPTS+{a:.3f}/TB[gf{k}]")
         v = con_sombra(fc, v, f"gf{k}", f"{gx}+({gw}-w)/2", f"{gy}+({gh}-h)/2", f"g{k}")
