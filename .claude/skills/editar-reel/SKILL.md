@@ -27,7 +27,9 @@ Si `modelos/` no existe, ejecuta `./instalar.sh` (descarga ~640 MB la primera ve
 4b. **GIFs sueltos** (`--gif RUTA@INI-FIN`, tiempos del vídeo ORIGINAL, los de `--transcribir`): cuando se
    quita el título, de uno en uno encima de la cabeza, cada uno mientras dice la palabra o frase que ilustra
    (p. ej. `gifs/sol-luz-brillante.gif@12.6-14.7` mientras dice "te expones a la luz"). Daniel los quiere largos: unos 3-4 s cada
-   uno, encadenados uno detrás de otro (casi sin huecos) desde que se quita el título hasta el final. Elige por el nombre del archivo; si un GIF nuevo tiene un
+   uno, encadenados uno detrás de otro (casi sin huecos) desde que se quita el título hasta el final.
+   `--gif` acepta también fotos: combina GIFs de `gifs/` y fotos de `fotos/<tema>/` (Daniel lo pidió así),
+   alternándolas para que no sean todo GIFs ni todo fotos. Elige por el nombre del archivo; si un GIF nuevo tiene un
    nombre poco claro, míralo (saca un fotograma) y renómbralo con `git mv` a algo descriptivo.
 4c. **Clips de Daniel / b-roll** (`--broll RUTA@INI-FIN`, tiempos del original): de `broll/`, a pantalla completa
    mientras sigue sonando su voz (los subtítulos siguen encima). 1,5-3 s, solo cuando ilustra lo que dice
