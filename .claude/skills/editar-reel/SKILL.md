@@ -21,9 +21,14 @@ Si `modelos/` no existe, ejecuta `./instalar.sh` (descarga ~640 MB la primera ve
 3. **Hook escrito** (`--hook-texto 'principal|secundaria'`): corto (4-7 palabras) para que quepa en una línea,
    complementa lo que dice sin repetirlo y crea curiosidad. La secundaria va entre paréntesis, opcional.
    Si el hook verbal no cumple my-rules.md (consejo genérico en vez de momento real), avísale.
-4. **Fotos** (`--imagen`, hasta 3, salen en fila encima del hook): elige de `fotos/<tema>/` según de qué hable
-   (comida, entrenamiento, sol, descanso, clientes, yo). En entrenamiento, prioriza tren superior / calistenia.
-   Si no hay fotos que encajen, mejor sin fotos que con fotos que no pegan.
+4. **Fotos y GIFs del hook** (`--imagen`, 3 en fila encima del título mientras dura el hook): fotos de
+   `fotos/<tema>/` o GIFs de `gifs/` que resuman la historia del vídeo (p. ej. agua → cortisol → dormir).
+   En entrenamiento, prioriza tren superior / calistenia. Mejor sin imagen que con una que no pega.
+4b. **GIFs sueltos** (`--gif RUTA@INI-FIN`, tiempos del vídeo ORIGINAL, los de `--transcribir`): cuando se
+   quita el título, de uno en uno encima de la cabeza, cada uno mientras dice la palabra o frase que ilustra
+   (p. ej. `gifs/sol-luz-brillante.gif@12.6-14.7` mientras dice "te expones a la luz"). Unos 1,5-3 s cada
+   uno; no hace falta que haya GIF todo el rato. Elige por el nombre del archivo; si un GIF nuevo tiene un
+   nombre poco claro, míralo (saca un fotograma) y renómbralo con `git mv` a algo descriptivo.
 5. **Música** (`--musica`, opcional): una pista de `musica/<ambiente>/` según el tema
    (tranquila: descanso/salud · motivadora: entrenamiento/mentalidad · emotiva: historias). Volumen por defecto 0.10.
    Solo música sin derechos de autor; si Daniel prefiere ponerla en Instagram, no pongas ninguna.
@@ -38,6 +43,7 @@ Si `modelos/` no existe, ejecuta `./instalar.sh` (descarga ~640 MB la primera ve
 ```
 python3 editar.py video.mp4 --corregir 'despones a los=>te expones a la' --quitar 2.7-3.9 \
   --hook-texto 'Agua al despertar = mejor sueño|(te explico por qué)' \
-  --imagen fotos/sol/amanecer.jpg --imagen fotos/comida/vaso-agua.jpg \
+  --imagen gifs/agua-beber-botella.gif --imagen gifs/cortisol-estres-medidor.gif --imagen gifs/dormir-pato-donald.gif \
+  --gif gifs/cortisol-estres-medidor.gif@10.7-12.1 --gif gifs/sol-luz-brillante.gif@12.6-14.7 \
   --musica musica/tranquila/pista1.mp3 --salida salidas/agua.mp4
 ```

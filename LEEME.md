@@ -29,7 +29,8 @@ Claude sigue la skill `.claude/skills/editar-reel` y tus reglas de `my-rules.md`
 
 - `--transcribir` solo transcribe y muestra cada palabra con su tiempo
 - `--hook-texto 'principal|secundaria'` hook escrito (se ajusta a una línea del ancho de las fotos)
-- `--imagen foto.jpg` foto encima del hook (repetible, hasta 3)
+- `--imagen foto.jpg` foto o GIF encima del hook (repetible, hasta 3)
+- `--gif gifs/sol.gif@12.6-14.7` GIF encima de la cabeza en ese tramo (segundos del vídeo original)
 - `--corregir 'mal=>bien'` corrige palabras mal transcritas
 - `--quitar 3.2-7.9` quita un tramo (segundos del vídeo original)
 - `--musica pista.mp3` música de fondo (`--musica-vol 0.10`)

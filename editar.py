@@ -263,6 +263,34 @@ def limpiar(t):
     return t if t in nombres or (t.isupper() and len(t) > 1) else t.lower()
 
 
+# Hueco para los GIFs sueltos: encima de la cabeza (contando el zoom de los cortes)
+GIF_ANCHO, GIF_ALTO, GIF_Y = 900, 400, 40
+
+
+def entrada_visual(ruta, dur):
+    """Argumentos de ffmpeg para una foto, GIF o clip, repetido en bucle durante `dur` segundos."""
+    ext = Path(ruta).suffix.lower()
+    if ext == ".gif":
+        bucle = ["-ignore_loop", "0"]
+    elif ext in (".mp4", ".mov", ".webm", ".m4v"):
+        bucle = ["-stream_loop", "-1"]
+    else:
+        bucle = ["-loop", "1"]
+    return bucle + ["-t", f"{dur:.3f}", "-i", str(ruta)]
+
+
+def a_salida(t, tramos):
+    """Pasa un segundo del vídeo original al vídeo final (ya con los cortes)."""
+    off = 0.0
+    for a, b in tramos:
+        if t < a:
+            return off
+        if t <= b:
+            return off + t - a
+        off += b - a
+    return off
+
+
 def filtro_zoom(tramos, args):
     """Zoom que alterna en cada corte (salto) + acercamiento lento dentro de cada tramo.
 
@@ -365,6 +393,9 @@ def main():
     ap.add_argument("--titulo-seg", type=float, default=0, help="Duración del título (0 = todo el vídeo)")
     ap.add_argument("--imagen", action="append", default=[],
                     help="Foto encima del hook (repetible, hasta 3 en fila)")
+    ap.add_argument("--gif", action="append", default=[], metavar="RUTA@INI-FIN",
+                    help="GIF/clip/foto encima de la cabeza de INI a FIN (segundos del vídeo ORIGINAL, "
+                         "los de --transcribir), p.ej. 'gifs/sol.gif@12.3-14.8'. Repetible")
     ap.add_argument("--clave", nargs="*", default=[], help="Palabras a resaltar en amarillo (def. ninguna)")
     # Cortes
     ap.add_argument("--corregir", action="append", default=[], metavar="'MAL=>BIEN'",
@@ -445,8 +476,21 @@ def main():
     i_hook = i_mus = None
     i_imgs = []
     for im in imagenes:
-        cmd += ["-loop", "1", "-t", f"{args.hook_texto_seg}", "-i", im]
+        cmd += entrada_visual(im, args.hook_texto_seg)
         i_imgs.append(idx)
+        idx += 1
+    # GIFs sueltos encima de la cabeza: (índice, inicio y fin en el vídeo final)
+    gifs = []
+    for g in args.gif:
+        ruta, _, rango = g.rpartition("@")
+        a, b = (float(x) for x in rango.split("-"))
+        a, b = a_salida(a, tramos), a_salida(b, tramos)
+        if b - a < 0.3:
+            print(f"      aviso: el GIF {ruta} cae en un tramo cortado, no lo pongo")
+            continue
+        print(f"      GIF {Path(ruta).name}: {a:.1f}-{b:.1f} s")
+        cmd += entrada_visual(ruta, b - a)
+        gifs.append((idx, a, b))
         idx += 1
     if args.hook:
         cmd += ["-i", args.hook]
@@ -479,6 +523,12 @@ def main():
                   f"setsar=1,format=rgba,fade=t=in:d=0.12:alpha=1,fade=t=out:st={fin_h - 0.15}:d=0.15:alpha=1[im{k}]")
         fc.append(f"[{v}][im{k}]overlay={x0 + k * (lado + hueco)}:{y_img}:eof_action=pass[vi{k}]")
         v = f"vi{k}"
+    for k, (ii, a, b) in enumerate(gifs):
+        fc.append(f"[{ii}:v]fps=30,scale={GIF_ANCHO}:{GIF_ALTO}:force_original_aspect_ratio=decrease,setsar=1,"
+                  f"format=rgba,fade=t=in:d=0.15:alpha=1,fade=t=out:st={b - a - 0.15:.3f}:d=0.15:alpha=1,"
+                  f"setpts=PTS-STARTPTS+{a:.3f}/TB[gf{k}]")
+        fc.append(f"[{v}][gf{k}]overlay=(W-w)/2:{GIF_Y}+({GIF_ALTO}-h)/2:eof_action=pass[vg{k}]")
+        v = f"vg{k}"
     ass_esc = str(ass_path.resolve()).replace("\\", "/").replace(":", r"\:").replace("'", r"\'")
     fdir = str(FUENTES).replace("\\", "/").replace(":", r"\:").replace("'", r"\'")
     fc.append(f"[{v}]ass='{ass_esc}':fontsdir='{fdir}'[vout]")
