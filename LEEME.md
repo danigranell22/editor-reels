@@ -30,6 +30,7 @@ Claude sigue la skill `.claude/skills/editar-reel` y tus reglas de `my-rules.md`
 - `--transcribir` solo transcribe y muestra cada palabra con su tiempo
 - `--hook-texto 'principal|secundaria'` hook escrito (se ajusta a una línea del ancho de las fotos)
 - `--imagen foto.jpg` foto o GIF encima del hook (repetible, hasta 3)
+- `--broll broll/clip.mp4@15.4-17.6` clip a pantalla completa en ese tramo (se oye tu voz)
 - `--gif gifs/sol.gif@12.6-14.7` GIF encima de la cabeza en ese tramo (segundos del vídeo original)
 - `--corregir 'mal=>bien'` corrige palabras mal transcritas
 - `--quitar 3.2-7.9` quita un tramo (segundos del vídeo original)

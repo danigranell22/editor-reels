@@ -267,6 +267,13 @@ def limpiar(t):
 GIF_ANCHO, GIF_ALTO, GIF_Y = 1000, 470, 30
 
 
+# Esquinas redondeadas (radio 28 px) para fotos y GIFs: recorta el canal alfa
+R_ESQUINA = 28
+ESQUINAS = ("geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':"
+            f"a='if(gt(abs(X-W/2),W/2-{R_ESQUINA})*gt(abs(Y-H/2),H/2-{R_ESQUINA}),"
+            f"if(lte(hypot(abs(X-W/2)-(W/2-{R_ESQUINA}),abs(Y-H/2)-(H/2-{R_ESQUINA})),{R_ESQUINA}),255,0),255)'")
+
+
 def entrada_visual(ruta, dur):
     """Argumentos de ffmpeg para una foto, GIF o clip, repetido en bucle durante `dur` segundos."""
     ext = Path(ruta).suffix.lower()
@@ -396,6 +403,9 @@ def main():
     ap.add_argument("--gif", action="append", default=[], metavar="RUTA@INI-FIN",
                     help="GIF/clip/foto encima de la cabeza de INI a FIN (segundos del vídeo ORIGINAL, "
                          "los de --transcribir), p.ej. 'gifs/sol.gif@12.3-14.8'. Repetible")
+    ap.add_argument("--broll", action="append", default=[], metavar="RUTA@INI-FIN",
+                    help="Clip a pantalla completa de INI a FIN (segundos del vídeo ORIGINAL); "
+                         "se oye tu voz, no el clip. Repetible")
     ap.add_argument("--clave", nargs="*", default=[], help="Palabras a resaltar en amarillo (def. ninguna)")
     # Cortes
     ap.add_argument("--corregir", action="append", default=[], metavar="'MAL=>BIEN'",
@@ -479,6 +489,19 @@ def main():
         cmd += entrada_visual(im, args.hook_texto_seg)
         i_imgs.append(idx)
         idx += 1
+    # Clips de b-roll a pantalla completa (sin su audio; la voz sigue debajo)
+    brolls = []
+    for c in args.broll:
+        ruta, _, rango = c.rpartition("@")
+        a, b = (float(x) for x in rango.split("-"))
+        a, b = a_salida(a, tramos), a_salida(b, tramos)
+        if b - a < 0.3:
+            print(f"      aviso: el clip {ruta} cae en un tramo cortado, no lo pongo")
+            continue
+        print(f"      clip {Path(ruta).name}: {a:.1f}-{b:.1f} s")
+        cmd += entrada_visual(ruta, b - a)
+        brolls.append((idx, a, b))
+        idx += 1
     # GIFs sueltos encima de la cabeza: (índice, inicio y fin en el vídeo final)
     gifs = []
     for g in args.gif:
@@ -515,17 +538,23 @@ def main():
     if args.zoom_cortes > 0 or args.zoom_lento > 0:
         fc.append(f"[{v}]{filtro_zoom(tramos, args)}[zoom]")
         v = "zoom"
+    for k, (ii, a, b) in enumerate(brolls):
+        fc.append(f"[{ii}:v]fps=30,scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},setsar=1,"
+                  f"format=rgba,fade=t=in:d=0.08:alpha=1,fade=t=out:st={b - a - 0.08:.3f}:d=0.08:alpha=1,"
+                  f"setpts=PTS-STARTPTS+{a:.3f}/TB[br{k}]")
+        fc.append(f"[{v}][br{k}]overlay=0:0:eof_action=pass[vb{k}]")
+        v = f"vb{k}"
     hueco = 4
     x0 = (W - len(i_imgs) * lado - (len(i_imgs) - 1) * hueco) // 2
     for k, ii in enumerate(i_imgs):
         fin_h = args.hook_texto_seg
         fc.append(f"[{ii}:v]scale={lado}:{lado}:force_original_aspect_ratio=increase,crop={lado}:{lado},"
-                  f"setsar=1,format=rgba,fade=t=in:d=0.12:alpha=1,fade=t=out:st={fin_h - 0.15}:d=0.15:alpha=1[im{k}]")
+                  f"setsar=1,format=rgba,{ESQUINAS},fade=t=in:d=0.12:alpha=1,fade=t=out:st={fin_h - 0.15}:d=0.15:alpha=1[im{k}]")
         fc.append(f"[{v}][im{k}]overlay={x0 + k * (lado + hueco)}:{y_img}:eof_action=pass[vi{k}]")
         v = f"vi{k}"
     for k, (ii, a, b) in enumerate(gifs):
         fc.append(f"[{ii}:v]fps=30,scale={GIF_ANCHO}:{GIF_ALTO}:force_original_aspect_ratio=decrease,setsar=1,"
-                  f"format=rgba,fade=t=in:d=0.15:alpha=1,fade=t=out:st={b - a - 0.15:.3f}:d=0.15:alpha=1,"
+                  f"format=rgba,{ESQUINAS},fade=t=in:d=0.15:alpha=1,fade=t=out:st={b - a - 0.15:.3f}:d=0.15:alpha=1,"
                   f"setpts=PTS-STARTPTS+{a:.3f}/TB[gf{k}]")
         fc.append(f"[{v}][gf{k}]overlay=(W-w)/2:{GIF_Y}+({GIF_ALTO}-h)/2:eof_action=pass[vg{k}]")
         v = f"vg{k}"
