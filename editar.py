@@ -263,6 +263,25 @@ def limpiar(t):
     return t if t in nombres or (t.isupper() and len(t) > 1) else t.lower()
 
 
+def filtro_zoom(tramos, args):
+    """Zoom que alterna en cada corte (salto) + acercamiento lento dentro de cada tramo.
+
+    El punto fijo del zoom está a la altura de la cara (42 % de la pantalla), así nunca se sale de plano.
+    Se trabaja a doble resolución para que el acercamiento lento no tiemble.
+    """
+    partes, ini = [], 0.0
+    for k, (a, b) in enumerate(tramos):
+        dur = b - a
+        base = 1 + (args.zoom_cortes if k % 2 else 0)
+        partes.append((ini + dur, f"{base:.4f}+{args.zoom_lento:.4f}*(it-{ini:.3f})/{dur:.3f}"))
+        ini += dur
+    expr = partes[-1][1]
+    for fin, e in reversed(partes[:-1]):
+        expr = f"if(lt(it,{fin:.3f}),{e},{expr})"
+    return (f"scale={W * 2}:{H * 2},zoompan=z='{expr}':d=1:fps=30:s={W}x{H}:"
+            f"x='iw/2-iw/zoom/2':y='ih*0.42-ih/zoom*0.42'")
+
+
 def ajustar_tam(texto, ancho, espaciado=-2, maximo=110):
     """Tamaño de letra para que el hook ocupe una sola línea del ancho de la fila de fotos."""
     from PIL import ImageFont
@@ -354,6 +373,10 @@ def main():
                     help="Quitar un tramo (segundos del original), p.ej. 3.2-7.9 para una toma repetida")
     ap.add_argument("--pausa-max", type=float, default=0.25, help="Silencio máximo que se deja (s)")
     ap.add_argument("--umbral", type=float, default=-35, help="Nivel (dB) por debajo del cual es silencio")
+    ap.add_argument("--zoom-cortes", type=float, default=0.10,
+                    help="Salto de zoom alterno en cada corte (0.10 = 10 %%, 0 = sin)")
+    ap.add_argument("--zoom-lento", type=float, default=0.03,
+                    help="Acercamiento lento dentro de cada tramo (0.03 = 3 %%, 0 = sin)")
     ap.add_argument("--sin-cortes", action="store_true", help="No cortar silencios ni muletillas")
     # Audio
     ap.add_argument("--musica", help="Música de fondo (se repite si es corta)")
@@ -445,6 +468,9 @@ def main():
 
     fc.append(f"[vc]scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},setsar=1,fps=30[base]")
     v = "base"
+    if args.zoom_cortes > 0 or args.zoom_lento > 0:
+        fc.append(f"[{v}]{filtro_zoom(tramos, args)}[zoom]")
+        v = "zoom"
     hueco = 4
     x0 = (W - len(i_imgs) * lado - (len(i_imgs) - 1) * hueco) // 2
     for k, ii in enumerate(i_imgs):

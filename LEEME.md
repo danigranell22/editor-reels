@@ -16,6 +16,10 @@ Claude sigue la skill `.claude/skills/editar-reel` y tus reglas de `my-rules.md`
 | `CLAUDE.md` | Estilo acordado y notas para Claude. |
 | `fotos/<tema>/` | Tus fotos para el hook. Claude las elige según de qué hables. |
 | `musica/<ambiente>/` | Música sin derechos de autor para el fondo. |
+| `gifs/` | GIFs y memes (.gif / .mp4). Nombre descriptivo: `cerebro-explota.gif`. |
+| `stickers/` | PNG con fondo transparente (flechas, iconos…). |
+| `broll/` | Clips cortos de vídeo (`muscle-up-barra.mp4`). |
+| `sonidos/` | Efectos de sonido (`whoosh.mp3`, `pop.mp3`). |
 | `fuentes/` | Inter Display (licencia libre SIL OFL). |
 | `editar.py` | El editor (`python3 editar.py --help` para ver todas las opciones). |
 | `instalar.sh` | Instala dependencias y descarga los modelos de transcripción (se ejecuta solo al abrir sesión). |
@@ -29,6 +33,7 @@ Claude sigue la skill `.claude/skills/editar-reel` y tus reglas de `my-rules.md`
 - `--corregir 'mal=>bien'` corrige palabras mal transcritas
 - `--quitar 3.2-7.9` quita un tramo (segundos del vídeo original)
 - `--musica pista.mp3` música de fondo (`--musica-vol 0.10`)
+- `--zoom-cortes 0.10` salto de zoom alterno en cada corte · `--zoom-lento 0.03` acercamiento lento (0 = sin)
 - `--clave palabra …` resalta esas palabras en amarillo
 - `--y-subs 0.80` altura de los subtítulos · `--tam-subs 52` tamaño
 - `--salida salidas/nombre.mp4`
