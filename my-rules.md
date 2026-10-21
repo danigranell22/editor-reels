@@ -40,6 +40,9 @@ Write your rules below, one per line.
 ## Gráficos, b-roll y música
 - Gráficos limpios y sobrios, nada recargado. Prefiero que se me vea y se me escuche a mí.
 - B-roll solo cuando ayude a entender la idea (comida real, entrenamiento, sol, descanso). Por mi lesión de rodilla, prioriza fotos y clips de tren superior o calistenia antes que clips míos corriendo o saltando.
+- Fotos y GIFs solo si ilustran claramente la frase que digo en ese momento. Si hay duda, no la pongas (nada de memes o paisajes que no pintan nada con lo que digo).
+- Mis clips (broll/) van siempre como vídeo, nunca como foto: no uses fotogramas ni miniaturas de mis vídeos (las fotos `-baja.jpg`).
+- No dejes un vídeo sin imágenes: si el tema es más abstracto (mentalidad, entorno…), usa fotos mías o de gente entrenando en el gimnasio.
 - Música de fondo suave, siempre por debajo de mi voz. Nunca debe competir con lo que digo.
 
 ## Audio
