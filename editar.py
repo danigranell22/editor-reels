@@ -517,6 +517,8 @@ def main():
                     help="Salto de zoom alterno en cada corte (0.10 = 10 %%, 0 = sin)")
     ap.add_argument("--zoom-lento", type=float, default=0.03,
                     help="Acercamiento lento dentro de cada tramo (0.03 = 3 %%, 0 = sin)")
+    ap.add_argument("--limpiar-audio", action="store_true",
+                    help="Quitar ruido y normalizar la voz (por defecto no: Daniel quiere el audio tal cual)")
     ap.add_argument("--subtitulos", action="store_true",
                     help="Quemar subtítulos en el vídeo (por defecto no: Daniel los pone en Edits)")
     ap.add_argument("--sin-cortes", action="store_true", help="No cortar silencios ni muletillas")
@@ -689,8 +691,11 @@ def main():
     # Audio: voz limpia (sin zumbidos ni ruido) + música/efecto por debajo
     mezcla = []
     if tiene_audio:
-        fc.append("[ac]highpass=f=80,afftdn=nr=12:nf=-40,loudnorm=I=-14:TP=-1.5:LRA=11,"
-                  "aresample=48000[voz]")
+        if args.limpiar_audio:
+            fc.append("[ac]highpass=f=80,afftdn=nr=12:nf=-40,loudnorm=I=-14:TP=-1.5:LRA=11,"
+                      "aresample=48000[voz]")
+        else:  # Daniel no quiere que se toque el audio: solo se recorta
+            fc.append("[ac]aresample=48000[voz]")
         mezcla.append("[voz]")
     if i_hook is not None:
         fc.append(f"[{i_hook}:a]volume={args.hook_vol},aresample=48000,apad[hk]")

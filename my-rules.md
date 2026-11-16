@@ -27,7 +27,7 @@ Write your rules below, one per line.
 - Mis 4 pilares de contenido son: historia, método, prueba y conexión.
 
 ## Hook (los primeros 3 segundos)
-- Cada vídeo lleva un hook verbal (lo que digo) y un hook escrito (texto grande en pantalla los primeros 2-3 segundos).
+- Cada vídeo lleva un hook verbal (lo que digo). El hook escrito (texto en pantalla) lo pongo yo en Edits: no lo añadas.
 - El hook escrito no repite literalmente lo que digo: lo complementa y crea curiosidad.
 - Mis hooks parten de un momento concreto real ("Hoy me ha pasado algo que...", "Llevo [tiempo] sintiendo...", "No sé si contar esto, pero..."), nunca de un consejo genérico ("Os voy a contar...", "Hoy os traigo...", "Un consejo:").
 
@@ -44,7 +44,7 @@ Write your rules below, one per line.
 - Música de fondo suave, siempre por debajo de mi voz. Nunca debe competir con lo que digo.
 
 ## Audio
-- Mi voz tiene que sonar clara y al volumen estándar de Instagram. Quita ruido de fondo y zumbidos.
+- No edites el audio: solo recórtalo con los cortes. Nada de quitar ruido, normalizar ni poner música.
 
 ## Antes de entregar
 - Avísame si algo del guion no encaja con lo grabado, en vez de inventarlo.

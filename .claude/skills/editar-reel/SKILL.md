@@ -5,7 +5,9 @@ description: Edita un vídeo de Daniel hablando a cámara y lo deja listo para I
 
 # Editar un Reel de Daniel
 
-**Un solo vídeo editado, formato normal, SIN subtítulos** (Daniel los pone después en Edits). Nada de
+**Un solo vídeo editado, formato normal, SIN subtítulos, SIN título/hook escrito y SIN tocar el audio** (Daniel
+pone subtítulos y título después en Edits; el audio solo se recorta, sin limpiar ni normalizar ni música).
+No uses `--hook-texto`, `--imagen` (fila del título), `--musica`, `--hook` ni `--limpiar-audio`. Nada de
 versiones ni formatos alternativos (bandas, recuadro, lateral, velocidad) salvo que él lo pida.
 
 Antes de nada, lee `my-rules.md` (reglas de Daniel) y `CLAUDE.md` (estilo acordado). Mandan sobre esta guía.
