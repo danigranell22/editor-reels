@@ -466,7 +466,8 @@ def crear_ass(palabras, duracion, lay, args):
         ass += f"Dialogue: 1,{ts(ini_t)},{ts(fin_t)},Titulo,,0,0,0,,{fade}{escapar(args.titulo)}\n"
 
     claves = {norm(c) for c in args.clave}
-    bloques = agrupar(palabras, args.palabras, args.max_chars)
+    # Daniel pone los subtítulos en Edits: por defecto no se queman (--subtitulos para ponerlos)
+    bloques = agrupar(palabras, args.palabras, args.max_chars) if args.subtitulos else []
     for i, bloque in enumerate(bloques):
         ini = bloque[0]["ini"]
         fin = bloque[-1]["fin"]
@@ -516,6 +517,8 @@ def main():
                     help="Salto de zoom alterno en cada corte (0.10 = 10 %%, 0 = sin)")
     ap.add_argument("--zoom-lento", type=float, default=0.03,
                     help="Acercamiento lento dentro de cada tramo (0.03 = 3 %%, 0 = sin)")
+    ap.add_argument("--subtitulos", action="store_true",
+                    help="Quemar subtítulos en el vídeo (por defecto no: Daniel los pone en Edits)")
     ap.add_argument("--sin-cortes", action="store_true", help="No cortar silencios ni muletillas")
     # Audio
     ap.add_argument("--musica", help="Música de fondo (se repite si es corta)")

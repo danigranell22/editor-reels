@@ -5,6 +5,9 @@ description: Edita un vídeo de Daniel hablando a cámara y lo deja listo para I
 
 # Editar un Reel de Daniel
 
+**Un solo vídeo editado, formato normal, SIN subtítulos** (Daniel los pone después en Edits). Nada de
+versiones ni formatos alternativos (bandas, recuadro, lateral, velocidad) salvo que él lo pida.
+
 Antes de nada, lee `my-rules.md` (reglas de Daniel) y `CLAUDE.md` (estilo acordado). Mandan sobre esta guía.
 Si `modelos/` no existe, ejecuta `./instalar.sh` (descarga ~640 MB la primera vez).
 
@@ -13,7 +16,7 @@ Si `modelos/` no existe, ejecuta `./instalar.sh` (descarga ~640 MB la primera ve
 Si Daniel dice "edita los vídeos de la carpeta X y guárdalos en Y" (en su ordenador suele ser
 `~/Desktop/Mobile Devices` → `~/Desktop/videos insta`; si no existen con ese nombre exacto, búscalas en el
 Escritorio y pregunta si hay dudas): procesa todos los vídeos de X (.mov, .mp4, .m4v), uno a uno, con los pasos
-de abajo. Guarda en Y una carpeta por vídeo con sus 5 versiones y su `_publicaciones.md`. No borres ni muevas
+de abajo. Guarda en Y el vídeo editado y su `_narracion.md`. No borres ni muevas
 los originales. Junta todas las dudas (palabras que no se entienden, hooks verbales flojos) en un solo mensaje
 al final.
 
@@ -52,18 +55,7 @@ al final.
 7. **Revisar** antes de entregar: saca fotogramas (`ffmpeg -ss T -i salida.mp4 -frames:v 1 f.png`) y mira que
    el hook quepa en una línea, que los subtítulos no tapen la cara y que no se corte ninguna palabra.
    Si hace falta, ajusta `--y-subs` (0-1) o `--tam-subs`.
-8. **Versiones para Reels de prueba** (Daniel quiere 5 por vídeo salvo que diga otra cosa): tienen que verse MUY
-   distintas para que Instagram no las tome por el mismo vídeo. Cada versión usa un `--formato` distinto y
-   además cambia el hook escrito y las imágenes del hook:
-   v1 `normal` · v2 `bandas` (franja fina 16:9 con la cara en medio; negro arriba con título/fotos/GIFs y abajo con subtítulos) · v3 `recuadro`
-   (mismo encuadre que bandas, pero en recuadro redondeado con negro a los lados) · v4 `lateral` (cara a la derecha, columna negra a la izquierda
-   con todo; máx. 2 fotos en el hook) · v5 `velocidad` (normal acelerado ×1,15).
-   Los hooks atacan ángulos distintos (beneficio, dato, acción, problema, concreto) sin prometer nada que no
-   diga en el vídeo. Evita GIFs que empiecen en negro en la fila del hook. La transcripción va en caché, así
-   que las versiones 2-5 van rápido. Nombres: `salidas/<nombre>_v1.mp4` … `_v5.mp4`.
-   Escribe `salidas/<nombre>_publicaciones.md` con una tabla de versiones y, para cada una, texto para
-   Instagram/TikTok (2-3 líneas, español de España, una llamada a la acción y 6-8 hashtags).
-9. **Análisis de la narración** (Daniel lo pidió: quiere ser más claro y retener más sin perder su forma de
+8. **Análisis de la narración** (Daniel lo pidió: quiere ser más claro y retener más sin perder su forma de
    hablar). Escribe `salidas/<nombre>_narracion.md`, corto y concreto, con frases suyas citadas:
    - Lo que funciona (que no lo pierda).
    - Cuánto tarda en llegar a la idea principal y si el hook verbal engancha (momento real, no consejo genérico).
@@ -74,7 +66,7 @@ al final.
    - Una versión reescrita del guion **con sus palabras y su tono** (canario, cercano), solo más directa; si
      propones un hook personal ("Llevo un mes…"), marca que solo vale si es verdad.
    - 2-3 tips para el próximo vídeo, no más.
-10. **Entregar** el MP4 con una línea de qué has cortado y qué has añadido, y los avisos que pide my-rules.md.
+9. **Entregar** el MP4 con una línea de qué has cortado y qué has añadido, y los avisos que pide my-rules.md.
 
 ## Ejemplo
 

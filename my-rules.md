@@ -32,9 +32,7 @@ Write your rules below, one per line.
 - Mis hooks parten de un momento concreto real ("Hoy me ha pasado algo que...", "Llevo [tiempo] sintiendo...", "No sé si contar esto, pero..."), nunca de un consejo genérico ("Os voy a contar...", "Hoy os traigo...", "Un consejo:").
 
 ## Subtítulos
-- Subtítulos siempre activados, en español, quemados en el vídeo.
-- Estilo: pocas palabras por línea (2-4), letra gruesa y legible, centrados en el tercio inferior, sin tapar mi cara.
-- Resalta en otro color la palabra clave de cada frase.
+- Los subtítulos los pongo yo en Edits: no los quemes en el vídeo. Deja libre el tercio inferior (ahí irán), sin gráficos ni fotos.
 - Revisa estos nombres en la transcripción: VNTDS Athletic (se lee "veintidós"), Las Canteras, Gran Canaria, Huberman, Hyrox, muscle up, CMJ, LCA.
 
 ## Gráficos, b-roll y música
