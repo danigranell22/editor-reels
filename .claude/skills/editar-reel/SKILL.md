@@ -63,7 +63,18 @@ al final.
    que las versiones 2-5 van rápido. Nombres: `salidas/<nombre>_v1.mp4` … `_v5.mp4`.
    Escribe `salidas/<nombre>_publicaciones.md` con una tabla de versiones y, para cada una, texto para
    Instagram/TikTok (2-3 líneas, español de España, una llamada a la acción y 6-8 hashtags).
-9. **Entregar** el MP4 con una línea de qué has cortado y qué has añadido, y los avisos que pide my-rules.md.
+9. **Análisis de la narración** (Daniel lo pidió: quiere ser más claro y retener más sin perder su forma de
+   hablar). Escribe `salidas/<nombre>_narracion.md`, corto y concreto, con frases suyas citadas:
+   - Lo que funciona (que no lo pierda).
+   - Cuánto tarda en llegar a la idea principal y si el hook verbal engancha (momento real, no consejo genérico).
+   - Frases demasiado largas o encadenadas con "y… que… cuando…", redundancias ("por lo tanto, por eso",
+     "poco a poco… despacito"), muletillas y arranques en mitad de una idea.
+   - Si hay giro/payoff y llamada a la acción al final (según su estructura de 5 bloques).
+   - Ritmo: palabras por segundo y pausas largas.
+   - Una versión reescrita del guion **con sus palabras y su tono** (canario, cercano), solo más directa; si
+     propones un hook personal ("Llevo un mes…"), marca que solo vale si es verdad.
+   - 2-3 tips para el próximo vídeo, no más.
+10. **Entregar** el MP4 con una línea de qué has cortado y qué has añadido, y los avisos que pide my-rules.md.
 
 ## Ejemplo
 
